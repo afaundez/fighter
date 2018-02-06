@@ -1,4 +1,2 @@
 require 'fighter/version'
-
-module Fighter
-end
+require 'fighter/cli'

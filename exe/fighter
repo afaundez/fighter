@@ -1,3 +1,5 @@
 #!/usr/bin/env ruby
 
 require 'fighter'
+
+Fighter::CLI.start(ARGV)
