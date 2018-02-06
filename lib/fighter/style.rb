@@ -1,3 +1,5 @@
+require 'erb'
+
 module Fighter
   class Style
     attr_accessor :framework
@@ -17,8 +19,15 @@ module Fighter
       self.all.each(&block)
     end
 
+    def fighterfile_content
+      ERB.new(fighterfile_template, nil, '-').result binding
+    end
+
     def self.all
-      [['basic', '1.0']].collect do |framework, version|
+      frameworks = File.join File.dirname(File.expand_path(__FILE__)), 'frameworks/**/*.yml'
+      Dir.glob(frameworks).collect do |framework_file|
+        framework = File.basename File.dirname(framework_file)
+        version = File.basename(framework_file, '.yml')
         self.new framework, version
       end
     end
@@ -27,5 +36,10 @@ module Fighter
       self.all.first
     end
 
+    private
+
+      def fighterfile_template
+        File.read Fighter.root.join('templates/fighter.yml.erb')
+      end
   end
 end

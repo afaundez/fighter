@@ -2,10 +2,11 @@ module Fighter
   module Phase
     class Prep
 
-      def self.run(cwd, options={})
+      def self.run(cwd, framework, version, options={})
+        style = Fighter::Style.new framework, version
         fighterfile = File.join cwd, '.fighter.yml'
         if options['force'] || !File.exist?(fighterfile)
-          File.write fighterfile, "# .fighter.yml\n"
+          File.write fighterfile, style.fighterfile_content
           gitignorefile = File.join cwd, '.gitignore'
           if !File.exist?(gitignorefile)
             File.write gitignorefile, ".fighter\n"

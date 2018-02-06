@@ -17,7 +17,7 @@ module Fighter
     LONGDESC
     def prep(framework=Fighter::Style.default.framework,
       version=Fighter::Style.default.version)
-      Phase::Prep.run Dir.pwd, options
+      Phase::Prep.run Dir.pwd, framework, version, options
     end
 
   end
