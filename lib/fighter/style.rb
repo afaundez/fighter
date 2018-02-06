@@ -1,4 +1,5 @@
 require 'erb'
+require 'yaml'
 
 module Fighter
   class Style
@@ -19,12 +20,16 @@ module Fighter
       self.all.each(&block)
     end
 
+    def techniques
+      YAML.load_file Fighter.root.join('config', 'frameworks', framework, "#{version}.yml")
+    end
+
     def fighterfile_content
       ERB.new(fighterfile_template, nil, '-').result binding
     end
 
     def self.all
-      frameworks = File.join File.dirname(File.expand_path(__FILE__)), 'frameworks/**/*.yml'
+      frameworks = File.join File.dirname(File.expand_path(__FILE__)), '../..', 'config', 'frameworks', '**/*.yml'
       Dir.glob(frameworks).collect do |framework_file|
         framework = File.basename File.dirname(framework_file)
         version = File.basename(framework_file, '.yml')
@@ -39,7 +44,7 @@ module Fighter
     private
 
       def fighterfile_template
-        File.read Fighter.root.join('templates/fighter.yml.erb')
+        File.read Fighter.root.join 'templates/fighter.yml.erb'
       end
   end
 end

@@ -1,0 +1,7 @@
+# fighter berksfile for <%= style.framework %> <%= style.version %>
+# check https://github.com/afaundez/fighter for more options
+source 'https://supermarket.chef.io'
+
+<%- style.techniques['chef_solo']['cookbooks'].each do |cookbook, config| -%>
+cookbook '<%= cookbook %>', '<%= config['version'] %>'
+<%- end -%>

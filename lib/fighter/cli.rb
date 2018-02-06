@@ -1,6 +1,7 @@
 require 'fighter/thor'
 require 'fighter/style'
 require 'fighter/phase/prep'
+require 'fighter/phase/ready'
 
 module Fighter
   class CLI < Thor
@@ -18,6 +19,11 @@ module Fighter
     def prep(framework=Fighter::Style.default.framework,
       version=Fighter::Style.default.version)
       Phase::Prep.run Dir.pwd, framework, version, options
+    end
+
+    desc 'go', 'Create environment from .fighter.yml and run it'
+    def go
+      Phase::Ready.run Dir.pwd, options
     end
 
   end
