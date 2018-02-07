@@ -42,22 +42,23 @@ describe Fighter::CLI do
     describe 'and fighterfile exists' do
       before :all do
         File.write @fighterfile, 'Already existing fighterfile'
-        @fighterfile_mtime = File.mtime(@fighterfile).to_f
-        @fighterfile_content = File.read(@fighterfile)
+        FileUtils.touch @fighterfile, mtime: Time.now - 60*60*24
+        @fighterfile_mtime = File.mtime @fighterfile
+        @fighterfile_content = File.read @fighterfile
       end
 
       describe 'and gitignore is not present' do
 
         it 'should not modify fighterfile nor create gitignorefile' do
           Dir.chdir(@dir) {Fighter::CLI.start args}
-          @fighterfile_mtime.must_equal File.mtime(@fighterfile).to_f
+          @fighterfile_mtime.must_equal File.mtime(@fighterfile)
           @fighterfile_content.must_equal File.read(@fighterfile)
           File.exists?(@gitignorefile).must_equal false
         end
 
         it 'should overwrite fighterfile and create gitignore if forcing' do
           Dir.chdir(@dir) {Fighter::CLI.start args.push('--force')}
-          @fighterfile_mtime.wont_equal File.mtime(@fighterfile).to_f
+          @fighterfile_mtime.wont_equal File.mtime(@fighterfile)
           File.read(@fighterfile).must_match "style:\n  framework: base\n  version: 1.0\n"
           File.read(@gitignorefile).must_match /^.fighter$/
         end
@@ -66,21 +67,22 @@ describe Fighter::CLI do
       describe 'and gitignore is present' do
         before :all do
           File.write @gitignorefile, '.tmp'
-          @gitignorefile_mtime = File.mtime(@gitignorefile).to_f
-          @gitignorefile_content = File.read(@gitignorefile)
+          FileUtils.touch @gitignorefile, mtime: Time.now - 60*60*24
+          @gitignorefile_mtime = File.mtime @gitignorefile
+          @gitignorefile_content = File.read @gitignorefile
         end
 
         it 'should not modify fighterfile nor gitignorefile' do
           Dir.chdir(@dir) {Fighter::CLI.start args}
-          @fighterfile_mtime.must_equal File.mtime(@fighterfile).to_f
+          @fighterfile_mtime.must_equal File.mtime(@fighterfile)
           @fighterfile_content.must_equal File.read(@fighterfile)
-          @gitignorefile_mtime.must_equal File.mtime(@gitignorefile).to_f
+          @gitignorefile_mtime.must_equal File.mtime(@gitignorefile)
           @gitignorefile_content.must_equal File.read(@gitignorefile)
         end
 
         it 'should overwrite fighterfile and modify gitignore if forcing' do
           Dir.chdir(@dir) {Fighter::CLI.start args.push('--force')}
-          @fighterfile_mtime.wont_equal File.mtime(@fighterfile).to_f
+          @fighterfile_mtime.wont_equal File.mtime(@fighterfile)
           File.read(@fighterfile).must_match "style:\n  framework: base\n  version: 1.0\n"
           File.read(@gitignorefile).must_match /.tmp$/
           File.read(@gitignorefile).must_match /^.fighter$/
