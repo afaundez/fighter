@@ -38,7 +38,7 @@ module Fighter
     end
 
     def self.default
-      self.all.first
+      self.new 'base', '1.0'
     end
 
     private
