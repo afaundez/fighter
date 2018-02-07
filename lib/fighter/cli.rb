@@ -2,6 +2,9 @@ require 'fighter/thor'
 require 'fighter/style'
 require 'fighter/phase/prep'
 require 'fighter/phase/ready'
+require 'fighter/phase/go'
+require 'fighter/phase/ko'
+require 'fighter/phase/retire'
 
 module Fighter
   class CLI < Thor
@@ -24,6 +27,17 @@ module Fighter
     desc 'go', 'Create environment from .fighter.yml and run it'
     def go
       Phase::Ready.run Dir.pwd, options
+      Phase::Go.run Dir.pwd, options
+    end
+
+    desc 'ko', 'Stop environment within .fighter'
+    def ko
+      Phase::KO.run Dir.pwd, options
+    end
+
+    desc 'retire', 'Destroy environment within .fighter'
+    def retire
+      Phase::Retire.run Dir.pwd, options
     end
 
   end

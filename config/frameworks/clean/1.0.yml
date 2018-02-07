@@ -1,0 +1,3 @@
+vm:
+  box: bento/ubuntu-16.04
+  hostname: fighter

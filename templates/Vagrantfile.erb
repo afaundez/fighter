@@ -1,27 +1,37 @@
 # fighter vagrantfile for <%= style.framework %> <%= style.version %>
 # check https://github.com/afaundez/fighter for more options
 Vagrant.configure('2') do |config|
-  config.vm.box = '<%= style.techniques['vm']['box'] %>'
-  <%- if style.techniques['vm']['network'] && style.techniques['vm']['network']['identifier'] -%>
-
-  <%- Array(style.techniques['vm']['network']['identifier']['comments']).each do |comment| -%>
-  <%= "# #{comment.strip}" %>
+  <%- if techniques = style.techniques -%>
+  <%- if vm = techniques['vm']-%>
+  config.vm.box = '<%= vm['box'] %>'
+  config.vm.hostname = '<%= vm['hostname'] %>'
+    <%- if network = vm['network']-%>
+      <%- if identifier = vm['network']-%>
+        <%- vm['network'].each do |type, parameters| -%>
+  config.vm.network '<%= type %>', ip: '<%= parameters['ip'] %>'
+        <%- end -%>
+      <%- end -%>
+    <%- end -%>
   <%- end -%>
-  config.vm.network 'private_network', ip: '<%= style.techniques['vm']['network']['identifier']['ip'] %>'
-
   <%- end -%>
+  <%- if chef_solo = techniques['chef_solo'] -%>
   config.vm.provision :chef_solo do |chef|
-    <%- attributes = {} -%>
-    <%- style.techniques['chef_solo']['cookbooks'].each do |cookbook, config| -%>
-    <%- config['includes'].each do |recipe| -%>
+    <%- if cookbooks = chef_solo['cookbooks'] -%>
+    chef.cookbooks_path = 'berks-cookbooks'
+      <%- attributes = {} -%>
+      <%- cookbooks.each do |cookbook, config| -%>
+        <%- config['includes'].each do |recipe| -%>
     chef.add_recipe '<%= recipe %>'
-    <%- end -%>
-    <%- attributes.merge! config['attributes'] unless config['attributes'].nil? -%>
-    <%- end -%>
-    <% lines = JSON.pretty_generate(attributes).lines %>
+        <%- end -%>
+        <%- attributes.merge! config['attributes'] unless config['attributes'].nil? -%>
+      <%- end -%>
+      <%- if !attributes.empty? && lines = JSON.pretty_generate(attributes).lines -%>
     chef.json = <%= lines.shift.strip %>
-    <%- lines.each do |line| -%>
+        <%- lines.each do |line| -%>
     <%= line.rstrip %>
+        <%- end -%>
+      <%- end -%>
     <%- end -%>
   end
+  <%- end -%>
 end

@@ -1,5 +1,7 @@
 require 'yaml'
 require 'json'
+require 'mixlib/shellout'
+require 'logger'
 
 module Fighter
   module Phase
@@ -19,6 +21,11 @@ module Fighter
             destination = File.join stage, File.basename(template, '.erb')
             File.write destination, rendered
           end
+
+          logger = Logger.new STDOUT
+          vagrant_up = Mixlib::ShellOut.new 'vagrant up', cwd: stage, live_stdout: logger
+          vagrant_up.run_command
+          vagrant_up.error!
         end
       end
 
